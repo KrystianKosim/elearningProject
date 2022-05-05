@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @RestController
@@ -31,20 +32,15 @@ public class LessonController {
 
     @GetMapping("/{lessonId}")
     ResponseEntity getSingleLesson(@PathVariable int lessonId) {
-        return lessons.stream()
-                .filter(lesson -> lesson.getLessonId() == lessonId)
-                .findAny()
-                .map(lesson -> new ResponseEntity(lesson, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity("Brak studenta o ID: " + lessonId, HttpStatus.NOT_FOUND));
+        return lessons.stream().filter(lesson -> lesson.getLessonId() == lessonId).findAny().map(lesson -> new ResponseEntity(lesson, HttpStatus.OK)).orElseGet(() -> new ResponseEntity("Brak studenta o ID: " + lessonId, HttpStatus.NOT_FOUND));
     }
 
     @DeleteMapping("/{lessonId}")
     ResponseEntity deleteLesson(@PathVariable int lessonId) {
-        for (Lesson lesson : lessons) {
-            if (lesson.getLessonId() == lessonId) {
-                lessons.remove(lesson);
-                return new ResponseEntity("Usunieto lekcje o ID: " + lessonId, HttpStatus.OK);
-            }
+        Optional<Lesson> toRemove = lessons.stream().filter(lesson -> lesson.getLessonId() == lessonId).findAny();
+        if (toRemove.isPresent()) {
+            lessons.remove(toRemove.get());
+            return new ResponseEntity(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity("Brak lekcji o podanym ID: " + lessonId, HttpStatus.NOT_FOUND);
     }
