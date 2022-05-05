@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/students")
@@ -56,4 +57,16 @@ class StudentController {
         return new ResponseEntity(student, HttpStatus.OK);
     }
 
+    @PatchMapping("/{email}")
+    public ResponseEntity editStudentPartially(@PathVariable String email, @RequestBody Student updatedStudent) {
+        if (students.stream().noneMatch(student -> student.getEmail().equals(email))) {
+            return new ResponseEntity("Brak studenta o danym emailu", HttpStatus.BAD_REQUEST);
+        }
+        Student student = students.stream().filter(s -> s.getEmail().equals(email)).findAny().get();
+        Optional.ofNullable(updatedStudent.getEmail()).ifPresent(student::setEmail);
+        Optional.ofNullable(updatedStudent.getRate()).ifPresent(student::setRate);
+        Optional.ofNullable(updatedStudent.getName()).ifPresent(student::setName);
+        Optional.ofNullable(updatedStudent.getTeacher()).ifPresent(student::setTeacher);
+        return new ResponseEntity(student, HttpStatus.OK);
+    }
 }
