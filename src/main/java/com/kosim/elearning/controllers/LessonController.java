@@ -32,12 +32,17 @@ public class LessonController {
 
     @GetMapping("/{lessonId}")
     ResponseEntity getSingleLesson(@PathVariable int lessonId) {
-        return lessons.stream().filter(lesson -> lesson.getLessonId() == lessonId).findAny().map(lesson -> new ResponseEntity(lesson, HttpStatus.OK)).orElseGet(() -> new ResponseEntity("Brak studenta o ID: " + lessonId, HttpStatus.NOT_FOUND));
+        return lessons.stream()
+                .filter(lesson -> lesson.getLessonId() == lessonId)
+                .findAny().map(lesson -> new ResponseEntity(lesson, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity("Brak lekcji o ID: " + lessonId, HttpStatus.NOT_FOUND));
     }
 
     @DeleteMapping("/{lessonId}")
     ResponseEntity deleteLesson(@PathVariable int lessonId) {
-        Optional<Lesson> toRemove = lessons.stream().filter(lesson -> lesson.getLessonId() == lessonId).findAny();
+        Optional<Lesson> toRemove = lessons.stream()
+                .filter(lesson -> lesson.getLessonId() == lessonId)
+                .findAny();
         if (toRemove.isPresent()) {
             lessons.remove(toRemove.get());
             return new ResponseEntity(HttpStatus.NO_CONTENT);
@@ -65,7 +70,7 @@ public class LessonController {
         lesson.setTeacherName(updateLesson.getTeacherName());
         lesson.setStudentName(updateLesson.getStudentName());
         lesson.setTopic(updateLesson.getTopic());
-        return new ResponseEntity(lesson, HttpStatus.OK);
+        return new ResponseEntity(lesson.toString(), HttpStatus.OK);
 
     }
 }
