@@ -1,76 +1,61 @@
 package com.kosim.elearning.controllers;
 
 import com.kosim.elearning.models.Lesson;
+import com.kosim.elearning.services.LessonService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.PostConstruct;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/lessons")
 public class LessonController {
-    private List<Lesson> lessons = new ArrayList<>();
 
-    @PostConstruct
-    void init() {
-        lessons.add(new Lesson(1, "22-04-2022", "Malinowska", "Jan Nowak", "Matematyka"));
-        lessons.add(new Lesson(2, "12-03-2022", "Kowalska", "Adrian Kowalczyk", "Polski"));
-        lessons.add(new Lesson(3, "01-02-2022", "Wierzbicka", "Adam Lewandowski", "Informatyka"));
-        lessons.add(new Lesson(4, "05-05-2022", "Szymanski", "Marcin Nowicki", "WF"));
-    }
+    private final LessonService lessonService;
 
     @GetMapping
-    ResponseEntity getAllLessons() {
-        return new ResponseEntity(lessons, HttpStatus.ACCEPTED);
+    ResponseEntity<List<Lesson>> getAllLessons() {
+        return new ResponseEntity<>(lessonService.getAllLessons(), HttpStatus.ACCEPTED);
     }
 
     @GetMapping("/{lessonId}")
-    ResponseEntity getSingleLesson(@PathVariable int lessonId) {
-        return lessons.stream()
-                .filter(lesson -> lesson.getLessonId() == lessonId)
-                .findAny().map(lesson -> new ResponseEntity(lesson, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity("Brak lekcji o ID: " + lessonId, HttpStatus.NOT_FOUND));
+    ResponseEntity<Lesson> getSingleLesson(@PathVariable int lessonId) {
+        Optional<Lesson> lesson = lessonService.getSingleLesson(lessonId);
+        if (lesson.isEmpty()) {
+            return new ResponseEntity("Brak lekcji o ID: " + lessonId, HttpStatus.NOT_FOUND);
+        } else {
+            return new ResponseEntity<>(lesson.get(), HttpStatus.OK);
+        }
     }
 
     @DeleteMapping("/{lessonId}")
-    ResponseEntity deleteLesson(@PathVariable int lessonId) {
-        Optional<Lesson> toRemove = lessons.stream()
-                .filter(lesson -> lesson.getLessonId() == lessonId)
-                .findAny();
-        if (toRemove.isPresent()) {
-            lessons.remove(toRemove.get());
+    ResponseEntity removeLesson(@PathVariable int lessonId) {
+        boolean result = lessonService.removeLessonById(lessonId);
+        if (result) {
             return new ResponseEntity(HttpStatus.NO_CONTENT);
+        } else {
+            return new ResponseEntity("Brak lekcji o podanym ID: " + lessonId, HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity("Brak lekcji o podanym ID: " + lessonId, HttpStatus.NOT_FOUND);
     }
 
     @PostMapping
-    ResponseEntity addLesson(@RequestBody Lesson lesson) {
-        if (lessons.stream().anyMatch(l -> l.getLessonId() == lesson.getLessonId())) {
+    ResponseEntity<Lesson> addLesson(@RequestBody Lesson lesson) {
+        if (!lessonService.addNewLesson(lesson)) {
             return new ResponseEntity("Lekcja o podanym id juz istnieje", HttpStatus.NOT_ACCEPTABLE);
         }
-        lessons.add(lesson);
-        return new ResponseEntity("Dodano lekcje " + lesson, HttpStatus.CREATED);
+        return new ResponseEntity<>(lesson, HttpStatus.CREATED);
     }
 
     @PutMapping("/{lessonId}")
     ResponseEntity editLesson(@PathVariable int lessonId, @RequestBody Lesson updateLesson) {
-        if (lessons.stream().noneMatch(l -> l.getLessonId() == lessonId)) {
+        Optional<Lesson> lesson = lessonService.editLesson(lessonId, updateLesson);
+        if (lesson.isEmpty()) {
             return new ResponseEntity("Brak lekcji o podanym id", HttpStatus.NOT_FOUND);
         }
-        Lesson lesson = lessons.stream().filter(l -> l.getLessonId() == lessonId).findAny().get();
-        lesson.setLessonId(updateLesson.getLessonId());
-        lesson.setDate(updateLesson.getDate());
-        lesson.setTeacherName(updateLesson.getTeacherName());
-        lesson.setStudentName(updateLesson.getStudentName());
-        lesson.setTopic(updateLesson.getTopic());
-        return new ResponseEntity(lesson.toString(), HttpStatus.OK);
-
+        return new ResponseEntity(lesson.get(), HttpStatus.OK);
     }
 }
