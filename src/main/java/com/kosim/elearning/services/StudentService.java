@@ -15,25 +15,25 @@ public class StudentService {
 
     private final StudentRepository studentRepository;
 
-    public List<Student> getAllStudents(){
+    public List<Student> getAllStudents() {
         return studentRepository.findAll();
     }
 
-    public Optional<Student> getSingleStudent(String email){
+    public Optional<Student> getSingleStudent(String email) {
         return studentRepository.findSingleStudent(email);
     }
 
-    public boolean addStudent(Student newStudent){
+    public boolean addStudent(Student newStudent) {
         Optional<Student> student = studentRepository.findSingleStudent(newStudent.getEmail());
-        if(student.isPresent()){
+        if (student.isPresent()) {
             return false;
         }
         return studentRepository.addStudent(newStudent);
     }
 
-    public Optional<Student> editEntireStudent(String email, Student updateStudent){
+    public Optional<Student> editEntireStudent(String email, Student updateStudent) {
         Optional<Student> foundedStudent = studentRepository.findSingleStudent(email);
-        if(foundedStudent.isPresent()){
+        if (foundedStudent.isPresent()) {
             Student student = foundedStudent.get();
             student.setEmail(updateStudent.getEmail());
             student.setName(updateStudent.getName());
@@ -43,9 +43,9 @@ public class StudentService {
         return foundedStudent;
     }
 
-    public Optional<Student> editStudent(String email, Student updateStudent){
+    public Optional<Student> editStudent(String email, Student updateStudent) {
         Optional<Student> foundedStudent = studentRepository.findSingleStudent(email);
-        if(foundedStudent.isPresent()){
+        if (foundedStudent.isPresent()) {
             Student student = foundedStudent.get();
             /**
              * Dlaczego musze to napisać tak student::setEmail a nie tak : student.setEmail(updateStudent.getEmail())
@@ -53,15 +53,15 @@ public class StudentService {
             Optional.ofNullable(updateStudent.getEmail()).ifPresent(student::setEmail);
             Optional.ofNullable(updateStudent.getName()).ifPresent(student::setName);
             Optional.ofNullable(updateStudent.getTeacher()).ifPresent(student::setTeacher);
-            if(updateStudent.getRate() > 0){
-             student.setEmail(updateStudent.getEmail());
+            if (updateStudent.getRate() > 0) {
+                student.setEmail(updateStudent.getEmail());
             }
             return foundedStudent;
         }
         return foundedStudent;
     }
 
-    public boolean removeStudent(String email){
-       return studentRepository.removeStudent(email);
+    public boolean removeStudent(String email) {
+        return studentRepository.removeStudent(email);
     }
 }

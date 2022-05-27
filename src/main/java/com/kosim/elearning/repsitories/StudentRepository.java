@@ -34,11 +34,6 @@ public class StudentRepository {
     }
 
     public boolean removeStudent(String email){
-        Optional<Student> foundedStudent = findSingleStudent(email);
-        if(foundedStudent.isPresent()){
-            Student studentToRemove = foundedStudent.get();
-           return STUDENTS.remove(studentToRemove);
-        }
-        return false;
+        return STUDENTS.removeIf(student -> student.getEmail().equals(email));
     }
 }

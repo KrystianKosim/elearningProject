@@ -34,7 +34,7 @@ public class LessonRepository {
         return LESSONS.removeIf(lesson -> lesson.getLessonId() == id);
     }
 
-    public boolean addLesson(Lesson lesson){
+    public boolean addLesson(Lesson lesson) {
         return LESSONS.add(lesson);
     }
 }

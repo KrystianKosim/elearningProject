@@ -47,14 +47,14 @@ public class LessonService {
         return foundedLesson;
     }
 
-    public Optional<Lesson> editLesson(int lessonId, Lesson lesson){
+    public Optional<Lesson> editLesson(int lessonId, Lesson updateLesson) {
         Optional<Lesson> foundedLesson = lessonRepository.findById(lessonId);
-        if(foundedLesson.isPresent()){
-            Lesson newLesson = foundedLesson.get();
-            Optional.ofNullable(lesson.getDate()).ifPresent(newLesson::setDate);
-            Optional.ofNullable(lesson.getTeacherName()).ifPresent(newLesson::setTeacherName);
-            Optional.ofNullable(lesson.getStudentName()).ifPresent(newLesson::setStudentName);
-            Optional.ofNullable(lesson.getTopic()).ifPresent(newLesson::setTopic);
+        if (foundedLesson.isPresent()) {
+            Lesson lesson = foundedLesson.get();
+            Optional.ofNullable(updateLesson.getDate()).ifPresent(lesson::setDate);
+            Optional.ofNullable(updateLesson.getTeacherName()).ifPresent(lesson::setTeacherName);
+            Optional.ofNullable(updateLesson.getStudentName()).ifPresent(lesson::setStudentName);
+            Optional.ofNullable(updateLesson.getTopic()).ifPresent(lesson::setTopic);
         }
         return foundedLesson;
     }

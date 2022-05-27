@@ -44,29 +44,29 @@ public class LessonController {
 
     @PostMapping
     ResponseEntity<Lesson> addLesson(@RequestBody Lesson lesson) {
-        if (!lessonService.addNewLesson(lesson)) {
-            return new ResponseEntity("Lekcja o podanym id juz istnieje", HttpStatus.NOT_ACCEPTABLE);
+        boolean result = lessonService.addNewLesson(lesson);
+        if (result) {
+            return new ResponseEntity<>(lesson, HttpStatus.CREATED);
         }
-        return new ResponseEntity<>(lesson, HttpStatus.CREATED);
+        return new ResponseEntity("Lekcja o podanym id juz istnieje " + lesson.getLessonId(), HttpStatus.NOT_ACCEPTABLE);
     }
 
     @PutMapping("/{lessonId}")
     ResponseEntity editEntireLesson(@PathVariable int lessonId, @RequestBody Lesson updateLesson) {
-        Optional<Lesson> optionalLesson = lessonService.editEntireLesson(lessonId, updateLesson);
-        if (optionalLesson.isEmpty()) {
-            return new ResponseEntity("Brak lekcji o podanym id", HttpStatus.NOT_FOUND);
+        Optional<Lesson> foundedLesson = lessonService.editEntireLesson(lessonId, updateLesson);
+        if (foundedLesson.isPresent()) {
+            return new ResponseEntity(foundedLesson.get(), HttpStatus.OK);
         }
-        Lesson lesson = optionalLesson.get();
-        return new ResponseEntity(lesson.toString(), HttpStatus.OK);
+        return new ResponseEntity("Brak lekcji o podanym id " + lessonId, HttpStatus.NOT_FOUND);
+
     }
-    
+
     @PatchMapping("/{lessonId}")
-    ResponseEntity editLesson(@PathVariable int lessonId, Lesson updateLesson){
-        Optional<Lesson> optionalLesson = lessonService.editLesson(lessonId,updateLesson);
-        if(optionalLesson.isPresent()){
-            Lesson lesson = optionalLesson.get();
-            return new ResponseEntity(lesson.toString(),HttpStatus.OK);
+    ResponseEntity editLesson(@PathVariable int lessonId, @RequestBody Lesson updateLesson) {
+        Optional<Lesson> foundedLesson = lessonService.editLesson(lessonId, updateLesson);
+        if (foundedLesson.isPresent()) {
+            return new ResponseEntity(foundedLesson.get(), HttpStatus.OK);
         }
-        return new ResponseEntity("Brak lekcji o podanym ID",HttpStatus.NOT_FOUND);
+        return new ResponseEntity("Brak lekcji o podanym ID " + lessonId, HttpStatus.NOT_FOUND);
     }
 }

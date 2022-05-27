@@ -7,9 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -25,47 +22,48 @@ public class StudentController {
     }
 
     @GetMapping("/{email}")
-    ResponseEntity getSingleStudent(@PathVariable String email){
+    ResponseEntity getSingleStudent(@PathVariable String email) {
         Optional<Student> student = studentService.getSingleStudent(email);
-        if(student.isEmpty()){
+        if (student.isEmpty()) {
             return new ResponseEntity("Brak studenta o emailu " + email, HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity(student.get(),HttpStatus.OK);
+        return new ResponseEntity(student.get(), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{email}")
+    ResponseEntity removeStudent(@PathVariable String email) {
+        boolean result = studentService.removeStudent(email);
+        if (result) {
+            return new ResponseEntity(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity("Brak studenta o podanym email " + email, HttpStatus.NOT_FOUND);
     }
 
     @PostMapping
-    ResponseEntity addStudent(@RequestBody Student student){
-        if(studentService.addStudent(student)){
+    ResponseEntity addStudent(@RequestBody Student student) {
+        if (studentService.addStudent(student)) {
             return new ResponseEntity("Dodano studenta", HttpStatus.CREATED);
         }
-        return new ResponseEntity("Student o podanym Email juz istnieje", HttpStatus.BAD_REQUEST);
+        return new ResponseEntity("Student o podanym Email juz istnieje " + student.getEmail(), HttpStatus.NOT_ACCEPTABLE);
     }
 
     @PutMapping("/{email}")
-    ResponseEntity editEntireStudent(@PathVariable String email,@RequestBody Student student){
-        Optional<Student> studentOptional = studentService.editEntireStudent(email,student);
-        if(studentOptional.isPresent()){
-            Student updatedStudent = studentOptional.get();
-            return new ResponseEntity(updatedStudent.toString(),HttpStatus.OK);
+    ResponseEntity editEntireStudent(@PathVariable String email, @RequestBody Student student) {
+        Optional<Student> studentOptional = studentService.editEntireStudent(email, student);
+        if (studentOptional.isPresent()) {
+            return new ResponseEntity(studentOptional.get(), HttpStatus.OK);
         }
         return new ResponseEntity("Brak studenta o podanym email " + email, HttpStatus.NOT_FOUND);
     }
 
     @PatchMapping("/{email}")
-    ResponseEntity editStudent(@PathVariable String email,@RequestBody Student student){
-        Optional<Student> foundedStudent = studentService.editStudent(email,student);
-        if(foundedStudent.isPresent()){
-            Student updatedStudent = foundedStudent.get();
-            return new ResponseEntity(updatedStudent.toString(),HttpStatus.OK);
+    ResponseEntity editStudent(@PathVariable String email, @RequestBody Student student) {
+        Optional<Student> foundedStudent = studentService.editStudent(email, student);
+        if (foundedStudent.isPresent()) {
+            return new ResponseEntity(foundedStudent.get(), HttpStatus.OK);
         }
         return new ResponseEntity("Brak studenta o podanym email " + email, HttpStatus.NOT_FOUND);
     }
 
-    @DeleteMapping("/{email}")
-    ResponseEntity removeStudent(@PathVariable String email){
-        if(studentService.removeStudent(email)){
-            return new ResponseEntity(HttpStatus.NO_CONTENT);
-        }
-        return new ResponseEntity("Brak studenta o podanym email " + email, HttpStatus.NOT_FOUND);
-    }
+
 }

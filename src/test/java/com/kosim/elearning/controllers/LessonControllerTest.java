@@ -23,7 +23,8 @@ class LessonControllerTest {
 
     @Test
     void shouldReturnSingleLesson() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/lessons/1"))
+        int lessonId = 1;
+        mockMvc.perform(MockMvcRequestBuilders.get("/lessons/" + lessonId))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.date").value("22-04-2022"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.teacherName").value("Malinowska"))
@@ -46,17 +47,21 @@ class LessonControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(lessonToAdd)))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.content().string("Dodano lekcje " + lessonToAdd));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.lessonId").value(5))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.date").value("10-10-2020"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.teacherName").value("Nowak"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.studentName").value("Anna Lewandowska"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.topic").value("Geografia"));
     }
 
     @Test
     void shouldReturnMessageWhenLessonIsExist() throws Exception {
-        Lesson lessonToAdd = new Lesson(2, "10-12-2017", "Nowacka", "Jan Milewski", "Polski");
+        Lesson lesson = new Lesson(2, "10-12-2017", "Nowacka", "Jan Milewski", "Polski");
         mockMvc.perform(MockMvcRequestBuilders.post("/lessons")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(lessonToAdd)))
+                        .content(objectMapper.writeValueAsString(lesson)))
                 .andExpect(MockMvcResultMatchers.status().isNotAcceptable())
-                .andExpect(MockMvcResultMatchers.content().string("Lekcja o podanym id juz istnieje"));
+                .andExpect(MockMvcResultMatchers.content().string("Lekcja o podanym id juz istnieje " + lesson.getLessonId()));
     }
 
     @Test
@@ -67,7 +72,7 @@ class LessonControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(lessonToEdit)))
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.content().string("Brak lekcji o podanym id"));
+                .andExpect(MockMvcResultMatchers.content().string("Brak lekcji o podanym id " + lessonId));
     }
 
 
@@ -79,19 +84,26 @@ class LessonControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(lessonToEdit)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string(lessonToEdit.toString()));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.lessonId").value(8))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.date").value("10-12-2017"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.teacherName").value("Nowacka"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.studentName").value("Jan Milewski"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.topic").value("Polski"));
     }
 
     @Test
-    void shouldEditLesson() throws Exception{
+    void shouldEditLesson() throws Exception {
         int lessonId = 3;
-        Lesson lesson = new Lesson(3,"01-02-2022", "Wierzbicka", "Adam Lewandowski", "Informatyka");
-        Lesson lessonToEdit = new Lesson(0,null,"Nowicka",null,null);
+        Lesson lessonToEdit = new Lesson(0, null, "Nowicka", null, null);
         mockMvc.perform(MockMvcRequestBuilders.patch("/lessons/" + lessonId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(lessonToEdit)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(lessonToEdit)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string(lesson.toString()));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.lessonId").value(3))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.date").value("01-02-2022"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.teacherName").value("Nowicka"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.studentName").value("Adam Lewandowski"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.topic").value("Informatyka"));
     }
 
 
