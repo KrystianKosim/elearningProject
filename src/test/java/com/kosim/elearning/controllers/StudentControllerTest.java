@@ -3,6 +3,7 @@ package com.kosim.elearning.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kosim.elearning.models.Student;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -46,6 +47,44 @@ class StudentControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(studentToAdd)))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
+    }
+
+    @Test
+    void shouldRemoveStudent() throws Exception{
+        String studentEmailToRemove = "jakub8899wp.pl";
+        mockMvc.perform(MockMvcRequestBuilders.delete("/students/" + studentEmailToRemove))
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
+    }
+
+    @Test
+    void shouldReturnMessageWhenEmailWhileDeleteIsWrong() throws Exception{
+        String studentEmailToRemove = "janek3000";
+        mockMvc.perform(MockMvcRequestBuilders.delete("/students/" + studentEmailToRemove))
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.content().string("Brak studenta o podanym email " + studentEmailToRemove));
+    }
+
+    @Test
+    void shouldReturnEntireUpdatedStudent() throws Exception{
+        String email = "jakub8899wp.pl";
+        Student student = new Student("Jakub Nowacki","jakub8899wp.pl","Anna Lewandowska",123);
+        mockMvc.perform(MockMvcRequestBuilders.put("/students/" + email)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(student)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string(student.toString()));
+    }
+
+    @Test
+    void shouldReturnUpdatedStudetn() throws Exception{
+        String email = "jakub8899wp.pl";
+        Student student = new Student(null,null,"Monika Nowinska",0);
+        Student expectStudent = new Student("Jakub Nowicki", "jakub8899wp.pl", "Monika Nowinska", 200);
+        mockMvc.perform(MockMvcRequestBuilders.patch("/students/"+email)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(student)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string(expectStudent.toString()));
     }
 
 }

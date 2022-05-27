@@ -34,7 +34,7 @@ public class LessonService {
         return lessonRepository.addLesson(lesson);
     }
 
-    public Optional<Lesson> editLesson(int lessonId, Lesson updateLesson) {
+    public Optional<Lesson> editEntireLesson(int lessonId, Lesson updateLesson) {
         Optional<Lesson> foundedLesson = lessonRepository.findById(lessonId);
         if (foundedLesson.isPresent()) {
             Lesson lesson = foundedLesson.get();
@@ -43,6 +43,18 @@ public class LessonService {
             lesson.setTeacherName(updateLesson.getTeacherName());
             lesson.setStudentName(updateLesson.getStudentName());
             lesson.setTopic(updateLesson.getTopic());
+        }
+        return foundedLesson;
+    }
+
+    public Optional<Lesson> editLesson(int lessonId, Lesson lesson){
+        Optional<Lesson> foundedLesson = lessonRepository.findById(lessonId);
+        if(foundedLesson.isPresent()){
+            Lesson newLesson = foundedLesson.get();
+            Optional.ofNullable(lesson.getDate()).ifPresent(newLesson::setDate);
+            Optional.ofNullable(lesson.getTeacherName()).ifPresent(newLesson::setTeacherName);
+            Optional.ofNullable(lesson.getStudentName()).ifPresent(newLesson::setStudentName);
+            Optional.ofNullable(lesson.getTopic()).ifPresent(newLesson::setTopic);
         }
         return foundedLesson;
     }

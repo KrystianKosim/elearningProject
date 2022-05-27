@@ -51,11 +51,22 @@ public class LessonController {
     }
 
     @PutMapping("/{lessonId}")
-    ResponseEntity editLesson(@PathVariable int lessonId, @RequestBody Lesson updateLesson) {
-        Optional<Lesson> lesson = lessonService.editLesson(lessonId, updateLesson);
-        if (lesson.isEmpty()) {
+    ResponseEntity editEntireLesson(@PathVariable int lessonId, @RequestBody Lesson updateLesson) {
+        Optional<Lesson> optionalLesson = lessonService.editEntireLesson(lessonId, updateLesson);
+        if (optionalLesson.isEmpty()) {
             return new ResponseEntity("Brak lekcji o podanym id", HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity(lesson.get(), HttpStatus.OK);
+        Lesson lesson = optionalLesson.get();
+        return new ResponseEntity(lesson.toString(), HttpStatus.OK);
+    }
+    
+    @PatchMapping("/{lessonId}")
+    ResponseEntity editLesson(@PathVariable int lessonId, Lesson updateLesson){
+        Optional<Lesson> optionalLesson = lessonService.editLesson(lessonId,updateLesson);
+        if(optionalLesson.isPresent()){
+            Lesson lesson = optionalLesson.get();
+            return new ResponseEntity(lesson.toString(),HttpStatus.OK);
+        }
+        return new ResponseEntity("Brak lekcji o podanym ID",HttpStatus.NOT_FOUND);
     }
 }

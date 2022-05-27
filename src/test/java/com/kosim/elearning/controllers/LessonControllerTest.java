@@ -72,7 +72,7 @@ class LessonControllerTest {
 
 
     @Test
-    void shouldEditLesson() throws Exception {
+    void shouldEditEntireLesson() throws Exception {
         int lessonId = 3;
         Lesson lessonToEdit = new Lesson(8, "10-12-2017", "Nowacka", "Jan Milewski", "Polski");
         mockMvc.perform(MockMvcRequestBuilders.put("/lessons/" + lessonId)
@@ -80,6 +80,18 @@ class LessonControllerTest {
                         .content(objectMapper.writeValueAsString(lessonToEdit)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().string(lessonToEdit.toString()));
+    }
+
+    @Test
+    void shouldEditLesson() throws Exception{
+        int lessonId = 3;
+        Lesson lesson = new Lesson(3,"01-02-2022", "Wierzbicka", "Adam Lewandowski", "Informatyka");
+        Lesson lessonToEdit = new Lesson(0,null,"Nowicka",null,null);
+        mockMvc.perform(MockMvcRequestBuilders.patch("/lessons/" + lessonId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(lessonToEdit)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string(lesson.toString()));
     }
 
 
