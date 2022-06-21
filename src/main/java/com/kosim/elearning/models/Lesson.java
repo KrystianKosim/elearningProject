@@ -3,8 +3,6 @@ package com.kosim.elearning.models;
 
 import lombok.*;
 
-import java.util.List;
-
 @Getter
 @Setter
 @AllArgsConstructor

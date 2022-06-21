@@ -1,5 +1,6 @@
 package com.kosim.elearning.models;
 
+
 import lombok.*;
 
 @Getter
@@ -7,9 +8,8 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class Student {
-    private String name;
+
+public class Teacher {
+    private String nameAndSurname;
     private String email;
-    private String teacher;
-    private Integer rate;
 }
