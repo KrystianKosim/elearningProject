@@ -1,6 +1,6 @@
 package com.kosim.elearning.services;
 
-import com.kosim.elearning.models.Teacher;
+import com.kosim.elearning.models.dto.Teacher;
 import com.kosim.elearning.repsitories.TeacherRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

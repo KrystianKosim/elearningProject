@@ -1,4 +1,4 @@
-package com.kosim.elearning.models;
+package com.kosim.elearning.models.dto;
 
 
 import lombok.*;
@@ -8,7 +8,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-
 public class Lesson {
     private int lessonId;
     private String date;
@@ -16,3 +15,4 @@ public class Lesson {
     private String studentName;
     private String topic;
 }
+//todo pozmieniac na lessonDto....

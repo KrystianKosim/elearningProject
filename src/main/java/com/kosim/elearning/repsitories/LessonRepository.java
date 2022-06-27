@@ -1,6 +1,6 @@
 package com.kosim.elearning.repsitories;
 
-import com.kosim.elearning.models.Lesson;
+import com.kosim.elearning.models.dto.Lesson;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;

@@ -1,4 +1,4 @@
-package com.kosim.elearning.models;
+package com.kosim.elearning.models.dto;
 
 
 import lombok.*;
@@ -8,7 +8,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-
 public class Teacher {
     private String nameAndSurname;
     private String email;

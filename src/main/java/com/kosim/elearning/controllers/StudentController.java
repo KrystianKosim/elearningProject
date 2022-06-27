@@ -1,6 +1,6 @@
 package com.kosim.elearning.controllers;
 
-import com.kosim.elearning.models.Student;
+import com.kosim.elearning.models.dto.Student;
 import com.kosim.elearning.services.StudentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

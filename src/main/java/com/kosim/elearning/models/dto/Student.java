@@ -1,4 +1,4 @@
-package com.kosim.elearning.models;
+package com.kosim.elearning.models.dto;
 
 import lombok.*;
 
