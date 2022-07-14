@@ -1,6 +1,6 @@
 package com.kosim.elearning.controllers;
 
-import com.kosim.elearning.models.dto.Lesson;
+import com.kosim.elearning.models.dto.LessonDto;
 import com.kosim.elearning.services.LessonService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,52 +18,52 @@ public class LessonController {
     private final LessonService lessonService;
 
     @GetMapping
-    ResponseEntity<List<Lesson>> getAllLessons() {
+    ResponseEntity<List<LessonDto>> getAllLessons() {
         return new ResponseEntity<>(lessonService.getAllLessons(), HttpStatus.ACCEPTED);
     }
 
     @GetMapping("/{lessonId}")
-    ResponseEntity<Lesson> getSingleLesson(@PathVariable int lessonId) {
-        Optional<Lesson> lesson = lessonService.getSingleLesson(lessonId);
+    ResponseEntity<LessonDto> getSingleLesson(@PathVariable Long lessonId) {
+        Optional<LessonDto> lesson = lessonService.getSingleLesson(lessonId);
         if (lesson.isEmpty()) {
-            return new ResponseEntity("Brak lekcji o ID: " + lessonId, HttpStatus.NOT_FOUND);
+            return new ResponseEntity("Brak lekcji o ID: ", HttpStatus.NOT_FOUND);
         } else {
             return new ResponseEntity<>(lesson.get(), HttpStatus.OK);
         }
     }
 
     @DeleteMapping("/{lessonId}")
-    ResponseEntity removeLesson(@PathVariable int lessonId) {
+    ResponseEntity removeLesson(@PathVariable Long lessonId) {
         boolean result = lessonService.removeLessonById(lessonId);
         if (result) {
             return new ResponseEntity(HttpStatus.NO_CONTENT);
         } else {
-            return new ResponseEntity("Brak lekcji o podanym ID: " + lessonId, HttpStatus.NOT_FOUND);
+            return new ResponseEntity("Brak lekcji o podanym ID: ", HttpStatus.NOT_FOUND);
         }
     }
 
     @PostMapping
-    ResponseEntity<Lesson> addLesson(@RequestBody Lesson lesson) {
+    ResponseEntity<LessonDto> addLesson(@RequestBody LessonDto lesson) {
         boolean result = lessonService.addNewLesson(lesson);
         if (result) {
             return new ResponseEntity<>(lesson, HttpStatus.CREATED);
         }
-        return new ResponseEntity("Lekcja o podanym id juz istnieje " + lesson.getLessonId(), HttpStatus.NOT_ACCEPTABLE);
+        return new ResponseEntity("Lekcja o podanym id juz istnieje ", HttpStatus.NOT_ACCEPTABLE);
     }
 
     @PutMapping("/{lessonId}")
-    ResponseEntity editEntireLesson(@PathVariable int lessonId, @RequestBody Lesson updateLesson) {
-        Optional<Lesson> foundedLesson = lessonService.editEntireLesson(lessonId, updateLesson);
+    ResponseEntity editEntireLesson(@PathVariable Long lessonId, @RequestBody LessonDto updateLesson) {
+        Optional<LessonDto> foundedLesson = lessonService.editEntireLesson(lessonId, updateLesson);
         if (foundedLesson.isPresent()) {
             return new ResponseEntity(foundedLesson.get(), HttpStatus.OK);
         }
-        return new ResponseEntity("Brak lekcji o podanym id " + lessonId, HttpStatus.NOT_FOUND);
+        return new ResponseEntity("Brak lekcji o podanym id ", HttpStatus.NOT_FOUND);
 
     }
 
     @PatchMapping("/{lessonId}")
-    ResponseEntity editLesson(@PathVariable int lessonId, @RequestBody Lesson updateLesson) {
-        Optional<Lesson> foundedLesson = lessonService.editLesson(lessonId, updateLesson);
+    ResponseEntity editLesson(@PathVariable Long lessonId, @RequestBody LessonDto updateLesson) {
+        Optional<LessonDto> foundedLesson = lessonService.editLesson(lessonId, updateLesson);
         if (foundedLesson.isPresent()) {
             return new ResponseEntity(foundedLesson.get(), HttpStatus.OK);
         }

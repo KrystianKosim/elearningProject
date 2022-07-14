@@ -1,13 +1,13 @@
 package com.kosim.elearning.models.entity;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
 
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Getter
 @Setter
 @Entity(name = "Student")
@@ -22,11 +22,12 @@ public class StudentEntity {
     @Column(unique = true)
     private String email;
 
+    // Główny nauczyciel
     @ManyToOne
-    private TeacherEntity teacher;
+    private TeacherEntity leadingTeacher;
 
     private Integer rate;
 
-    @OneToMany(mappedBy = "student")
-    private List<LessonEntity> lessons;
+//    @OneToMany(mappedBy = "students")
+//    private List<LessonEntity> lessons;
 }

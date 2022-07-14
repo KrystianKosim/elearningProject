@@ -1,13 +1,14 @@
 package com.kosim.elearning.models.entity;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 @Getter
 @Setter
 @Entity(name = "Lesson")
@@ -20,7 +21,8 @@ public class LessonEntity {
     @ManyToOne
     private TeacherEntity teacher;
 
-    @ManyToOne
-    private StudentEntity student;
+    @OneToMany
+    private List<StudentEntity> students;
+
     private String topic;
 }

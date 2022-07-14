@@ -1,6 +1,6 @@
 package com.kosim.elearning.controllers;
 
-import com.kosim.elearning.models.dto.Teacher;
+import com.kosim.elearning.models.dto.TeacherDto;
 import com.kosim.elearning.services.TeacherService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,7 +23,7 @@ public class TeacherController {
 
     @GetMapping("/{email}")
     ResponseEntity getSingleTeacher(@PathVariable String email) {
-        Optional<Teacher> foundedTeacher = teacherService.getSingleTeacher(email);
+        Optional<TeacherDto> foundedTeacher = teacherService.getSingleTeacher(email);
         if (foundedTeacher.isEmpty()) {
             return new ResponseEntity("Brak nauczyciela o podanym email " + email, HttpStatus.NOT_FOUND);
         }
@@ -41,17 +41,17 @@ public class TeacherController {
     }
 
     @PostMapping
-    ResponseEntity addTeacher(@RequestBody Teacher teacher) {
-        boolean result = teacherService.addTeacher(teacher);
+    ResponseEntity addTeacher(@RequestBody TeacherDto teacherDto) {
+        boolean result = teacherService.addTeacher(teacherDto);
         if (result) {
-            return new ResponseEntity(teacher, HttpStatus.CREATED);
+            return new ResponseEntity(teacherDto, HttpStatus.CREATED);
         }
-        return new ResponseEntity("Nauczyciel o podanym email juz istnieje " + teacher.getEmail(), HttpStatus.NOT_ACCEPTABLE);
+        return new ResponseEntity("Nauczyciel o podanym email juz istnieje " + teacherDto.getEmail(), HttpStatus.NOT_ACCEPTABLE);
     }
 
     @PutMapping("/{email}")
-    ResponseEntity editEntireTeacher(@PathVariable String email, @RequestBody Teacher teacher) {
-        Optional<Teacher> foundedTeacher = teacherService.editEntireTeacher(email, teacher);
+    ResponseEntity editEntireTeacher(@PathVariable String email, @RequestBody TeacherDto teacherDto) {
+        Optional<TeacherDto> foundedTeacher = teacherService.editEntireTeacher(email, teacherDto);
         if (foundedTeacher.isPresent()) {
             return new ResponseEntity(foundedTeacher.get(), HttpStatus.OK);
         }
@@ -59,8 +59,8 @@ public class TeacherController {
     }
 
     @PatchMapping("/{email}")
-    ResponseEntity editTeacher(@PathVariable String email, @RequestBody Teacher teacher) {
-        Optional<Teacher> foundedTeacher = teacherService.editTeacher(email, teacher);
+    ResponseEntity editTeacher(@PathVariable String email, @RequestBody TeacherDto teacherDto) {
+        Optional<TeacherDto> foundedTeacher = teacherService.editTeacher(email, teacherDto);
         if (foundedTeacher.isPresent()) {
             return new ResponseEntity(foundedTeacher.get(), HttpStatus.OK);
         }

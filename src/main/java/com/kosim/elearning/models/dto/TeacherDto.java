@@ -1,5 +1,6 @@
 package com.kosim.elearning.models.dto;
 
+
 import lombok.*;
 
 @Getter
@@ -7,9 +8,8 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class Student {
+@Builder
+public class TeacherDto {
     private String name;
     private String email;
-    private String teacher;
-    private Integer rate;
 }

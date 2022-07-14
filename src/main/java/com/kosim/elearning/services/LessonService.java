@@ -1,62 +1,101 @@
 package com.kosim.elearning.services;
 
-import com.kosim.elearning.models.dto.Lesson;
+import com.kosim.elearning.models.dto.LessonDto;
+import com.kosim.elearning.models.entity.LessonEntity;
 import com.kosim.elearning.repsitories.LessonRepository;
+import com.kosim.elearning.repsitories.StudentRepository;
+import com.kosim.elearning.repsitories.TeacherRepository;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class LessonService {
 
     private final LessonRepository lessonRepository;
+    private final TeacherRepository teacherRepository;
+    private final StudentRepository studentRepository;
 
-    public List<Lesson> getAllLessons() {
-        return lessonRepository.findAll();
+    private final ModelMapper modelMapper;
+
+    public List<LessonDto> getAllLessons() {
+        List<LessonEntity> foundedLessons = lessonRepository.findAll();
+        return foundedLessons.stream()
+                .map(lessonEntity ->  LessonDto.builder()
+                        .date(lessonEntity.getDate())
+                        .topic(lessonEntity.getTopic())
+                        .teacherId(lessonEntity.getTeacher().getId())
+                        .students(lessonEntity.getStudents().stream()
+                                .map(studentEntity -> studentEntity.getId())
+                                .collect(Collectors.toList()))
+                        .build()
+                )
+                .collect(Collectors.toList());
     }
 
-    public Optional<Lesson> getSingleLesson(int lessonId) {
-        return lessonRepository.findById(lessonId);
+    public Optional<LessonDto> getSingleLesson(Long lessonId) {
+        Optional<LessonEntity> foundedLesson = lessonRepository.findById(lessonId);
+        return foundedLesson.map(lessonEntity ->  modelMapper.map(lessonEntity,LessonDto.class));
     }
 
-    public boolean removeLessonById(int lessonId) {
-        return lessonRepository.removeById(lessonId);
+    public boolean removeLessonById(Long lessonId) {
+        Optional<LessonEntity> foundedLesson = lessonRepository.findById(lessonId);
+        if(foundedLesson.isPresent()){
+            lessonRepository.deleteById(lessonId);
+            return true;
+        }
+        return false;
     }
 
-    public boolean addNewLesson(Lesson lesson) {
-        Optional<Lesson> foundedLesson = lessonRepository.findById(lesson.getLessonId());
+    public boolean addNewLesson(LessonDto lesson) {
+        LessonEntity lessonEntity = modelMapper.map(lesson,LessonEntity.class);
+        Optional<LessonEntity> foundedLesson = lessonRepository.findById(lessonEntity.getId());
         if (foundedLesson.isPresent()) {
             return false;
         }
-        return lessonRepository.addLesson(lesson);
+        lessonRepository.save(lessonEntity);
+        return true;
     }
 
-    public Optional<Lesson> editEntireLesson(int lessonId, Lesson updateLesson) {
-        Optional<Lesson> foundedLesson = lessonRepository.findById(lessonId);
+    public Optional<LessonDto> editEntireLesson(Long lessonId, LessonDto updateLesson) {
+        Optional<LessonEntity> foundedLesson = lessonRepository.findById(lessonId);
         if (foundedLesson.isPresent()) {
-            Lesson lesson = foundedLesson.get();
-            lesson.setLessonId(updateLesson.getLessonId());
+            LessonEntity lesson = foundedLesson.get();
             lesson.setDate(updateLesson.getDate());
-            lesson.setTeacherName(updateLesson.getTeacherName());
-            lesson.setStudentName(updateLesson.getStudentName());
+            lesson.setTeacher(teacherRepository.getById(updateLesson.getTeacherId()));
+            lesson.setStudents(updateLesson.getStudents().stream()
+                    .map(value -> studentRepository.getById(value))
+                    .collect(Collectors.toList()));
             lesson.setTopic(updateLesson.getTopic());
         }
-        return foundedLesson;
+        return foundedLesson.map(lessonEntity ->  modelMapper.map(lessonEntity,LessonDto.class));
     }
 
-    public Optional<Lesson> editLesson(int lessonId, Lesson updateLesson) {
-        Optional<Lesson> foundedLesson = lessonRepository.findById(lessonId);
+    public Optional<LessonDto> editLesson(Long lessonId, LessonDto updateLesson) {
+        Optional<LessonEntity> foundedLesson = lessonRepository.findById(lessonId);
         if (foundedLesson.isPresent()) {
-            Lesson lesson = foundedLesson.get();
-            Optional.ofNullable(updateLesson.getDate()).ifPresent(lesson::setDate);
-            Optional.ofNullable(updateLesson.getTeacherName()).ifPresent(lesson::setTeacherName);
-            Optional.ofNullable(updateLesson.getStudentName()).ifPresent(lesson::setStudentName);
-            Optional.ofNullable(updateLesson.getTopic()).ifPresent(lesson::setTopic);
+            LessonEntity lessonEntity = foundedLesson.get();
+            Optional.ofNullable(updateLesson.getDate()).ifPresent(lessonEntity::setDate);
+            boolean areStudentsIdInList =  Optional.ofNullable(updateLesson.getStudents()).isPresent();
+            if(areStudentsIdInList){
+                List<Long> studentsId = updateLesson.getStudents();
+                lessonEntity.setStudents(studentsId.stream()
+                        .map(value -> studentRepository.getById(value))
+                        .collect(Collectors.toList()));
+            }
+            Long teacherId = updateLesson.getTeacherId();
+            if(teacherId > 0){
+                lessonEntity.setTeacher(teacherRepository.getById(teacherId));
+            }
+            Optional.ofNullable(updateLesson.getTopic()).ifPresent(lessonEntity::setTopic);
         }
-        return foundedLesson;
+        return foundedLesson.map(lessonEntity ->  modelMapper.map(lessonEntity,LessonDto.class));
     }
 
 }
