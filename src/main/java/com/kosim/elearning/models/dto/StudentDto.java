@@ -1,19 +1,16 @@
-package com.kosim.elearning.models;
+package com.kosim.elearning.models.dto;
 
 import lombok.*;
 
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-/*
-@RequiredArgsContructor
-@EqualsAndHashCode
- */
-public class Student {
+public class StudentDto {
     private String name;
     private String email;
-    private String teacher;
+    private long teacherId;
     private Integer rate;
 }

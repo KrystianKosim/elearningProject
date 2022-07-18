@@ -1,72 +1,70 @@
 package com.kosim.elearning.controllers;
 
-import com.kosim.elearning.models.Student;
+import com.kosim.elearning.exceptions.NoStudentWithGivenEmailException;
+import com.kosim.elearning.models.dto.StudentDto;
+import com.kosim.elearning.services.StudentService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/students")
-class StudentController {
-    private List<Student> students = new ArrayList<>();
+public class StudentController {
 
-    @PostConstruct
-    void init() {
-        students.add(new Student("Mirosław Kowalski", "mirek@gmail.com", "Michał Leja", 200));
-        students.add(new Student("Jakub Nowicki", "jakub8899wp.pl", "Michał Leja", 200));
-    }
+    private final StudentService studentService;
 
     @GetMapping
     ResponseEntity getAllStudents() {
-        return new ResponseEntity(students, HttpStatus.ACCEPTED);
+        return new ResponseEntity(studentService.getAllStudents(), HttpStatus.ACCEPTED);
     }
 
     @GetMapping("/{email}")
-    ResponseEntity getSingleStudent(@PathVariable String email) {
-        return students.stream()
-                .filter(s -> s.getEmail().equals(email))
-                .findAny()
-                .map(student -> new ResponseEntity(student, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity("Brak studenta o emailu " + email, HttpStatus.NOT_FOUND));
+    ResponseEntity<StudentDto> getSingleStudent(@PathVariable String email) throws NoStudentWithGivenEmailException {
+        Optional<StudentDto> student = studentService.getSingleStudent(email);
+        if (student.isEmpty()) {
+            throw new NoStudentWithGivenEmailException("Brak studenta o emailu " + email, HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(student.get(), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{email}")
+    ResponseEntity removeStudent(@PathVariable String email) {
+        boolean result = studentService.removeStudent(email);
+        if (result) {
+            return new ResponseEntity(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity("Brak studenta o podanym email " + email, HttpStatus.NOT_FOUND);
     }
 
     @PostMapping
-    ResponseEntity addStudent(@RequestBody Student student) {
-        if (students.stream().anyMatch(s -> s.getEmail().equals(student.getEmail()))) {
-            return new ResponseEntity("Konto z takim email już istnieje", HttpStatus.BAD_REQUEST);
+    ResponseEntity addStudent(@RequestBody StudentDto studentDto) {
+        if (studentService.addStudent(studentDto)) {
+            return new ResponseEntity("Dodano studenta", HttpStatus.CREATED);
         }
-        students.add(student);
-        return new ResponseEntity(HttpStatus.CREATED);
+        return new ResponseEntity("Student o podanym Email juz istnieje " + studentDto.getEmail(), HttpStatus.NOT_ACCEPTABLE);
     }
 
     @PutMapping("/{email}")
-    public ResponseEntity editStudent(@PathVariable String email, @RequestBody Student updatedStudent) {
-        if (students.stream().noneMatch(student -> student.getEmail().equals(email))) {
-            return new ResponseEntity("Brak studenta o danym emailu", HttpStatus.BAD_REQUEST);
+    ResponseEntity editEntireStudent(@PathVariable String email, @RequestBody StudentDto studentDto) throws NoStudentWithGivenEmailException {
+        Optional<StudentDto> studentOptional = studentService.editEntireStudent(email, studentDto);
+        if (studentOptional.isPresent()) {
+            return new ResponseEntity(studentOptional.get(), HttpStatus.OK);
         }
-        Student student = students.stream().filter(s -> s.getEmail().equals(email)).findAny().get();
-        student.setEmail(updatedStudent.getEmail());
-        student.setName(updatedStudent.getName());
-        student.setTeacher(updatedStudent.getTeacher());
-        student.setRate(updatedStudent.getRate());
-        return new ResponseEntity(student, HttpStatus.OK);
+        throw new NoStudentWithGivenEmailException("Brak studenta o podanym email " + email, HttpStatus.NOT_FOUND);
     }
 
     @PatchMapping("/{email}")
-    public ResponseEntity editStudentPartially(@PathVariable String email, @RequestBody Student updatedStudent) {
-        if (students.stream().noneMatch(student -> student.getEmail().equals(email))) {
-            return new ResponseEntity("Brak studenta o danym emailu", HttpStatus.BAD_REQUEST);
+    ResponseEntity editStudent(@PathVariable String email, @RequestBody StudentDto studentDto) throws NoStudentWithGivenEmailException {
+        Optional<StudentDto> foundedStudent = studentService.editStudent(email, studentDto);
+        if (foundedStudent.isPresent()) {
+            return new ResponseEntity(foundedStudent.get(), HttpStatus.OK);
         }
-        Student student = students.stream().filter(s -> s.getEmail().equals(email)).findAny().get();
-        Optional.ofNullable(updatedStudent.getEmail()).ifPresent(student::setEmail);
-        Optional.ofNullable(updatedStudent.getRate()).ifPresent(student::setRate);
-        Optional.ofNullable(updatedStudent.getName()).ifPresent(student::setName);
-        Optional.ofNullable(updatedStudent.getTeacher()).ifPresent(student::setTeacher);
-        return new ResponseEntity(student, HttpStatus.OK);
+        throw new NoStudentWithGivenEmailException("Brak studenta o podanym email " + email, HttpStatus.NOT_FOUND);
     }
+
+
 }
