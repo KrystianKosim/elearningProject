@@ -2,6 +2,7 @@ package com.kosim.elearning.services;
 
 import com.kosim.elearning.models.dto.LessonDto;
 import com.kosim.elearning.models.entity.LessonEntity;
+import com.kosim.elearning.models.entity.StudentEntity;
 import com.kosim.elearning.models.repsitories.LessonRepository;
 import com.kosim.elearning.models.repsitories.StudentRepository;
 import com.kosim.elearning.models.repsitories.TeacherRepository;
@@ -31,7 +32,7 @@ public class LessonService {
                         .topic(lessonEntity.getTopic())
                         .teacherId(lessonEntity.getTeacher().getId())
                         .students(lessonEntity.getStudents().stream()
-                                .map(studentEntity -> studentEntity.getId())
+                                .map(StudentEntity::getId)
                                 .collect(Collectors.toList()))
                         .build()
                 )
@@ -66,7 +67,7 @@ public class LessonService {
             lesson.setDate(updateLesson.getDate());
             lesson.setTeacher(teacherRepository.getById(updateLesson.getTeacherId()));
             lesson.setStudents(updateLesson.getStudents().stream()
-                    .map(value -> studentRepository.getById(value))
+                    .map(studentRepository::getById)
                     .collect(Collectors.toList()));
             lesson.setTopic(updateLesson.getTopic());
         }

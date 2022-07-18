@@ -39,7 +39,6 @@ public class TeacherDtoControllerTest {
                 .andExpect(MockMvcResultMatchers.content().string("Brak nauczyciela o podanym email " + email));
     }
 
-    //TODO blad gdy nauczyciel jest przypisany do ucznia
     @Test
     void shouldRemoveTeacher() throws Exception {
         String email = "karolina@gmail.com";

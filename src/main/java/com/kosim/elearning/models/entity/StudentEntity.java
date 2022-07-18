@@ -22,12 +22,8 @@ public class StudentEntity {
     @Column(unique = true)
     private String email;
 
-    // Główny nauczyciel
     @ManyToOne
     private TeacherEntity leadingTeacher;
 
     private Integer rate;
-
-//    @OneToMany(mappedBy = "students")
-//    private List<LessonEntity> lessons;
 }

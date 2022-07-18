@@ -53,7 +53,6 @@ class StudentDtoControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isCreated());
     }
 
-    //TODO usuwanie uzywanego studenta
     @Test
     void shouldRemoveStudent() throws Exception {
         String studentEmailToRemove = "marekmail@mail.com";
