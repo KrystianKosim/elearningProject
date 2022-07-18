@@ -1,5 +1,6 @@
 package com.kosim.elearning.controllers;
 
+import com.kosim.elearning.exceptions.NoLessonWithGivenIdException;
 import com.kosim.elearning.models.dto.LessonDto;
 import com.kosim.elearning.services.LessonService;
 import lombok.RequiredArgsConstructor;
@@ -23,23 +24,23 @@ public class LessonController {
     }
 
     @GetMapping("/{lessonId}")
-    ResponseEntity<LessonDto> getSingleLesson(@PathVariable Long lessonId) {
+    ResponseEntity<LessonDto> getSingleLesson(@PathVariable Long lessonId) throws NoLessonWithGivenIdException {
         Optional<LessonDto> lesson = lessonService.getSingleLesson(lessonId);
         if (lesson.isEmpty()) {
-            return new ResponseEntity("Brak lekcji o ID: ", HttpStatus.NOT_FOUND);
+            throw new NoLessonWithGivenIdException("Brak lekcji o ID", HttpStatus.NOT_FOUND);
         } else {
             return new ResponseEntity<>(lesson.get(), HttpStatus.OK);
         }
     }
 
     @DeleteMapping("/{lessonId}")
-    ResponseEntity removeLesson(@PathVariable Long lessonId) {
+    ResponseEntity removeLesson(@PathVariable Long lessonId) throws NoLessonWithGivenIdException {
         boolean result = lessonService.removeLessonById(lessonId);
         if (result) {
             return new ResponseEntity(HttpStatus.NO_CONTENT);
-        } else {
-            return new ResponseEntity("Brak lekcji o podanym ID: ", HttpStatus.NOT_FOUND);
         }
+        throw new NoLessonWithGivenIdException("Brak lekcji o ID", HttpStatus.NOT_FOUND);
+
     }
 
     @PostMapping
@@ -52,21 +53,21 @@ public class LessonController {
     }
 
     @PutMapping("/{lessonId}")
-    ResponseEntity editEntireLesson(@PathVariable Long lessonId, @RequestBody LessonDto updateLesson) {
+    ResponseEntity editEntireLesson(@PathVariable Long lessonId, @RequestBody LessonDto updateLesson) throws NoLessonWithGivenIdException {
         Optional<LessonDto> foundedLesson = lessonService.editEntireLesson(lessonId, updateLesson);
         if (foundedLesson.isPresent()) {
             return new ResponseEntity(foundedLesson.get(), HttpStatus.OK);
         }
-        return new ResponseEntity("Brak lekcji o podanym id ", HttpStatus.NOT_FOUND);
+        throw new NoLessonWithGivenIdException("Brak lekcji o ID", HttpStatus.NOT_FOUND);
 
     }
 
     @PatchMapping("/{lessonId}")
-    ResponseEntity editLesson(@PathVariable Long lessonId, @RequestBody LessonDto updateLesson) {
+    ResponseEntity editLesson(@PathVariable Long lessonId, @RequestBody LessonDto updateLesson) throws NoLessonWithGivenIdException {
         Optional<LessonDto> foundedLesson = lessonService.editLesson(lessonId, updateLesson);
         if (foundedLesson.isPresent()) {
             return new ResponseEntity(foundedLesson.get(), HttpStatus.OK);
         }
-        return new ResponseEntity("Brak lekcji o podanym ID " + lessonId, HttpStatus.NOT_FOUND);
+        throw new NoLessonWithGivenIdException("Brak lekcji o ID", HttpStatus.NOT_FOUND);
     }
 }

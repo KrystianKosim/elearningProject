@@ -1,4 +1,4 @@
-package com.kosim.elearning.repsitories;
+package com.kosim.elearning.models.repsitories;
 
 import com.kosim.elearning.models.entity.LessonEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,7 +1,7 @@
 package com.kosim.elearning.controllers;
 
+import com.kosim.elearning.exceptions.NoStudentWithGivenEmailException;
 import com.kosim.elearning.models.dto.StudentDto;
-import com.kosim.elearning.models.entity.StudentEntity;
 import com.kosim.elearning.services.StudentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,12 +23,12 @@ public class StudentController {
     }
 
     @GetMapping("/{email}")
-    ResponseEntity getSingleStudent(@PathVariable String email) {
+    ResponseEntity<StudentDto> getSingleStudent(@PathVariable String email) throws NoStudentWithGivenEmailException {
         Optional<StudentDto> student = studentService.getSingleStudent(email);
         if (student.isEmpty()) {
-            return new ResponseEntity("Brak studenta o emailu " + email, HttpStatus.NOT_FOUND);
+            throw new NoStudentWithGivenEmailException("Brak studenta o emailu " + email, HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity(student.get(), HttpStatus.OK);
+        return new ResponseEntity<>(student.get(), HttpStatus.OK);
     }
 
     @DeleteMapping("/{email}")
@@ -49,21 +49,21 @@ public class StudentController {
     }
 
     @PutMapping("/{email}")
-    ResponseEntity editEntireStudent(@PathVariable String email, @RequestBody StudentDto studentDto) {
+    ResponseEntity editEntireStudent(@PathVariable String email, @RequestBody StudentDto studentDto) throws NoStudentWithGivenEmailException {
         Optional<StudentDto> studentOptional = studentService.editEntireStudent(email, studentDto);
         if (studentOptional.isPresent()) {
             return new ResponseEntity(studentOptional.get(), HttpStatus.OK);
         }
-        return new ResponseEntity("Brak studenta o podanym email " + email, HttpStatus.NOT_FOUND);
+        throw new NoStudentWithGivenEmailException("Brak studenta o podanym email " + email, HttpStatus.NOT_FOUND);
     }
 
     @PatchMapping("/{email}")
-    ResponseEntity editStudent(@PathVariable String email, @RequestBody StudentDto studentDto) {
+    ResponseEntity editStudent(@PathVariable String email, @RequestBody StudentDto studentDto) throws NoStudentWithGivenEmailException {
         Optional<StudentDto> foundedStudent = studentService.editStudent(email, studentDto);
         if (foundedStudent.isPresent()) {
             return new ResponseEntity(foundedStudent.get(), HttpStatus.OK);
         }
-        return new ResponseEntity("Brak studenta o podanym email " + email, HttpStatus.NOT_FOUND);
+        throw new NoStudentWithGivenEmailException("Brak studenta o podanym email " + email, HttpStatus.NOT_FOUND);
     }
 
 

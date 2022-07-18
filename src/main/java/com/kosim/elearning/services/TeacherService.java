@@ -2,7 +2,7 @@ package com.kosim.elearning.services;
 
 import com.kosim.elearning.models.dto.TeacherDto;
 import com.kosim.elearning.models.entity.TeacherEntity;
-import com.kosim.elearning.repsitories.TeacherRepository;
+import com.kosim.elearning.models.repsitories.TeacherRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,14 +28,20 @@ public class TeacherService {
 
     public Optional<TeacherDto> getSingleTeacher(String email) {
         Optional<TeacherEntity> foundedTeacher = teacherRepository.findTeacherEntityByEmail(email);
-            return foundedTeacher.map(teacherEntity -> TeacherDto.builder()
-                    .name(teacherEntity.getName())
-                    .email(teacherEntity.getEmail())
-                    .build());
+        return foundedTeacher.map(teacherEntity -> TeacherDto.builder()
+                .name(teacherEntity.getName())
+                .email(teacherEntity.getEmail())
+                .build());
     }
 
     public boolean removeTeacher(String email) {
-        return teacherRepository.deleteTeacherEntityByEmail(email);
+        Optional<TeacherEntity> foundedTeacher = teacherRepository.findTeacherEntityByEmail(email);
+        if (foundedTeacher.isPresent()) {
+            Long teacherId = foundedTeacher.get().getId();
+            teacherRepository.deleteById(teacherId);
+            return true;
+        }
+        return false;
     }
 
     public boolean addTeacher(TeacherDto teacherDto) {
@@ -47,8 +53,8 @@ public class TeacherService {
                 .name(teacherDto.getName())
                 .email(teacherDto.getEmail())
                 .build();
-         teacherRepository.save(teacherEntity);
-         return true;
+        teacherRepository.save(teacherEntity);
+        return true;
     }
 
     public Optional<TeacherDto> editEntireTeacher(String email, TeacherDto updateTeacherDto) {

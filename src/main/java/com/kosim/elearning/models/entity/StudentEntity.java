@@ -3,13 +3,13 @@ package com.kosim.elearning.models.entity;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Getter
 @Setter
+@ToString
 @Entity(name = "Student")
 public class StudentEntity {
 

@@ -39,45 +39,54 @@ public class TeacherDtoControllerTest {
                 .andExpect(MockMvcResultMatchers.content().string("Brak nauczyciela o podanym email " + email));
     }
 
+    //TODO blad gdy nauczyciel jest przypisany do ucznia
     @Test
     void shouldRemoveTeacher() throws Exception {
-        String email = "annakowalska@wp.pl";
+        String email = "karolina@gmail.com";
         mockMvc.perform(MockMvcRequestBuilders.delete("/teacher/" + email))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
     }
 
     @Test
     void shouldAddTeacher() throws Exception {
-        TeacherDto teacherDto = new TeacherDto("Anna Nowa", "nowaAnna@mail.com");
+        TeacherDto teacherDto = TeacherDto.builder()
+                .name("Anna Nowa")
+                .email("nowaAnna@mail.com")
+                .build();
         mockMvc.perform(MockMvcRequestBuilders.post("/teacher")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(teacherDto)))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.nameAndSurname").value("Anna Nowa"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Anna Nowa"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.email").value("nowaAnna@mail.com"));
     }
 
     @Test
     void shouldEditEntireTeacher() throws Exception {
         String email = "zalewski@o2.pl";
-        TeacherDto teacherDto = new TeacherDto("Mariusz Zalewski", "zalewski@gmail.com");
+        TeacherDto teacherDto = TeacherDto.builder()
+                .name("Mariusz Zalewski")
+                .email("zalewski@gmail.com")
+                .build();
         mockMvc.perform(MockMvcRequestBuilders.put("/teacher/" + email)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(teacherDto)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.nameAndSurname").value("Mariusz Zalewski"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Mariusz Zalewski"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.email").value("zalewski@gmail.com"));
     }
 
     @Test
     void shouldEditTeacher() throws Exception {
         String email = "halinamalinowska@o2.pl";
-        TeacherDto teacherDto = new TeacherDto(null, "halinamalinowska@gmail.com");
+        TeacherDto teacherDto = TeacherDto.builder()
+                .email("halinamalinowska@gmail.com")
+                .build();
         mockMvc.perform(MockMvcRequestBuilders.patch("/teacher/" + email)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(teacherDto)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.nameAndSurname").value("Halina Malinowska"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Halina Malinowska"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.email").value("halinamalinowska@gmail.com"));
     }
 }

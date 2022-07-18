@@ -2,7 +2,7 @@ package com.kosim.elearning.config.modelmapper.mappings;
 
 import com.kosim.elearning.models.dto.StudentDto;
 import com.kosim.elearning.models.entity.StudentEntity;
-import com.kosim.elearning.repsitories.TeacherRepository;
+import com.kosim.elearning.models.repsitories.TeacherRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.Converter;
 import org.modelmapper.spi.MappingContext;

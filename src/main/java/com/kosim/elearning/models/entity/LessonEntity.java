@@ -11,17 +11,20 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
+@ToString
 @Entity(name = "Lesson")
 public class LessonEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private LocalDateTime date;
 
     @ManyToOne
     private TeacherEntity teacher;
 
-    @OneToMany
+    @ManyToMany
     private List<StudentEntity> students;
 
     private String topic;

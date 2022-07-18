@@ -1,5 +1,6 @@
 package com.kosim.elearning.controllers;
 
+import com.kosim.elearning.exceptions.NoTeacherWithGivenEmailException;
 import com.kosim.elearning.models.dto.TeacherDto;
 import com.kosim.elearning.services.TeacherService;
 import lombok.RequiredArgsConstructor;
@@ -22,22 +23,22 @@ public class TeacherController {
     }
 
     @GetMapping("/{email}")
-    ResponseEntity getSingleTeacher(@PathVariable String email) {
+    ResponseEntity getSingleTeacher(@PathVariable String email) throws NoTeacherWithGivenEmailException {
         Optional<TeacherDto> foundedTeacher = teacherService.getSingleTeacher(email);
         if (foundedTeacher.isEmpty()) {
-            return new ResponseEntity("Brak nauczyciela o podanym email " + email, HttpStatus.NOT_FOUND);
+            throw new NoTeacherWithGivenEmailException("Brak nauczyciela o podanym email " + email, HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity(foundedTeacher.get(), HttpStatus.OK);
 
     }
 
     @DeleteMapping("/{email}")
-    ResponseEntity removeTeacher(@PathVariable String email) {
+    ResponseEntity removeTeacher(@PathVariable String email) throws NoTeacherWithGivenEmailException {
         boolean result = teacherService.removeTeacher(email);
         if (result) {
             return new ResponseEntity(HttpStatus.NO_CONTENT);
         }
-        return new ResponseEntity("Brak nauczyciela o podanym email " + email, HttpStatus.NOT_FOUND);
+        throw new NoTeacherWithGivenEmailException("Brak nauczyciela o podanym email " + email, HttpStatus.NOT_FOUND);
     }
 
     @PostMapping
@@ -50,20 +51,20 @@ public class TeacherController {
     }
 
     @PutMapping("/{email}")
-    ResponseEntity editEntireTeacher(@PathVariable String email, @RequestBody TeacherDto teacherDto) {
+    ResponseEntity editEntireTeacher(@PathVariable String email, @RequestBody TeacherDto teacherDto) throws NoTeacherWithGivenEmailException {
         Optional<TeacherDto> foundedTeacher = teacherService.editEntireTeacher(email, teacherDto);
         if (foundedTeacher.isPresent()) {
             return new ResponseEntity(foundedTeacher.get(), HttpStatus.OK);
         }
-        return new ResponseEntity("Brak nauczyciela o podanym email " + email, HttpStatus.NOT_FOUND);
+        throw new NoTeacherWithGivenEmailException("Brak nauczyciela o podanym email " + email, HttpStatus.NOT_FOUND);
     }
 
     @PatchMapping("/{email}")
-    ResponseEntity editTeacher(@PathVariable String email, @RequestBody TeacherDto teacherDto) {
+    ResponseEntity editTeacher(@PathVariable String email, @RequestBody TeacherDto teacherDto) throws NoTeacherWithGivenEmailException {
         Optional<TeacherDto> foundedTeacher = teacherService.editTeacher(email, teacherDto);
         if (foundedTeacher.isPresent()) {
             return new ResponseEntity(foundedTeacher.get(), HttpStatus.OK);
         }
-        return new ResponseEntity("Brak nauczyciela o podanym email " + email, HttpStatus.NOT_FOUND);
+        throw new NoTeacherWithGivenEmailException("Brak nauczyciela o podanym email " + email, HttpStatus.NOT_FOUND);
     }
 }

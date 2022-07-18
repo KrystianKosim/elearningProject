@@ -2,14 +2,13 @@ package com.kosim.elearning.services;
 
 import com.kosim.elearning.models.dto.LessonDto;
 import com.kosim.elearning.models.entity.LessonEntity;
-import com.kosim.elearning.repsitories.LessonRepository;
-import com.kosim.elearning.repsitories.StudentRepository;
-import com.kosim.elearning.repsitories.TeacherRepository;
+import com.kosim.elearning.models.repsitories.LessonRepository;
+import com.kosim.elearning.models.repsitories.StudentRepository;
+import com.kosim.elearning.models.repsitories.TeacherRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,7 +26,7 @@ public class LessonService {
     public List<LessonDto> getAllLessons() {
         List<LessonEntity> foundedLessons = lessonRepository.findAll();
         return foundedLessons.stream()
-                .map(lessonEntity ->  LessonDto.builder()
+                .map(lessonEntity -> LessonDto.builder()
                         .date(lessonEntity.getDate())
                         .topic(lessonEntity.getTopic())
                         .teacherId(lessonEntity.getTeacher().getId())
@@ -41,12 +40,12 @@ public class LessonService {
 
     public Optional<LessonDto> getSingleLesson(Long lessonId) {
         Optional<LessonEntity> foundedLesson = lessonRepository.findById(lessonId);
-        return foundedLesson.map(lessonEntity ->  modelMapper.map(lessonEntity,LessonDto.class));
+        return foundedLesson.map(lessonEntity -> modelMapper.map(lessonEntity, LessonDto.class));
     }
 
     public boolean removeLessonById(Long lessonId) {
         Optional<LessonEntity> foundedLesson = lessonRepository.findById(lessonId);
-        if(foundedLesson.isPresent()){
+        if (foundedLesson.isPresent()) {
             lessonRepository.deleteById(lessonId);
             return true;
         }
@@ -54,11 +53,8 @@ public class LessonService {
     }
 
     public boolean addNewLesson(LessonDto lesson) {
-        LessonEntity lessonEntity = modelMapper.map(lesson,LessonEntity.class);
-        Optional<LessonEntity> foundedLesson = lessonRepository.findById(lessonEntity.getId());
-        if (foundedLesson.isPresent()) {
-            return false;
-        }
+        LessonEntity lessonEntity = modelMapper.map(lesson, LessonEntity.class);
+        System.out.println(lessonEntity);
         lessonRepository.save(lessonEntity);
         return true;
     }
@@ -74,7 +70,7 @@ public class LessonService {
                     .collect(Collectors.toList()));
             lesson.setTopic(updateLesson.getTopic());
         }
-        return foundedLesson.map(lessonEntity ->  modelMapper.map(lessonEntity,LessonDto.class));
+        return foundedLesson.map(lessonEntity -> modelMapper.map(lessonEntity, LessonDto.class));
     }
 
     public Optional<LessonDto> editLesson(Long lessonId, LessonDto updateLesson) {
@@ -82,20 +78,17 @@ public class LessonService {
         if (foundedLesson.isPresent()) {
             LessonEntity lessonEntity = foundedLesson.get();
             Optional.ofNullable(updateLesson.getDate()).ifPresent(lessonEntity::setDate);
-            boolean areStudentsIdInList =  Optional.ofNullable(updateLesson.getStudents()).isPresent();
-            if(areStudentsIdInList){
+            boolean areStudentsIdInList = Optional.ofNullable(updateLesson.getStudents()).isPresent();
+            if (areStudentsIdInList) {
                 List<Long> studentsId = updateLesson.getStudents();
                 lessonEntity.setStudents(studentsId.stream()
-                        .map(value -> studentRepository.getById(value))
+                        .map(studentRepository::getById)
                         .collect(Collectors.toList()));
             }
-            Long teacherId = updateLesson.getTeacherId();
-            if(teacherId > 0){
-                lessonEntity.setTeacher(teacherRepository.getById(teacherId));
-            }
+            Optional.ofNullable(updateLesson.getTeacherId()).ifPresent(id -> lessonEntity.setTeacher(teacherRepository.getById(id)));
             Optional.ofNullable(updateLesson.getTopic()).ifPresent(lessonEntity::setTopic);
         }
-        return foundedLesson.map(lessonEntity ->  modelMapper.map(lessonEntity,LessonDto.class));
+        return foundedLesson.map(lessonEntity -> modelMapper.map(lessonEntity, LessonDto.class));
     }
 
 }

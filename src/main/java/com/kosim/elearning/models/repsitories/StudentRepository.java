@@ -1,4 +1,4 @@
-package com.kosim.elearning.repsitories;
+package com.kosim.elearning.models.repsitories;
 
 import com.kosim.elearning.models.entity.StudentEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,6 +10,4 @@ import java.util.Optional;
 public interface StudentRepository extends JpaRepository<StudentEntity, Long> {
 
     Optional<StudentEntity> findStudentEntityByEmail(String email);
-
-    boolean deleteByEmail(String email);
 }

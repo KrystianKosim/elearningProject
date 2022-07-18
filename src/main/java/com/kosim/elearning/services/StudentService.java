@@ -2,9 +2,8 @@ package com.kosim.elearning.services;
 
 import com.kosim.elearning.models.dto.StudentDto;
 import com.kosim.elearning.models.entity.StudentEntity;
-import com.kosim.elearning.models.entity.TeacherEntity;
-import com.kosim.elearning.repsitories.StudentRepository;
-import com.kosim.elearning.repsitories.TeacherRepository;
+import com.kosim.elearning.models.repsitories.StudentRepository;
+import com.kosim.elearning.models.repsitories.TeacherRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -40,7 +39,6 @@ public class StudentService {
             return false;
         }
         StudentEntity studentEntityToAdd = modelMapper.map(newStudentDto, StudentEntity.class);
-//        studentRepository.save(studentEntityToAdd);
         studentRepository.saveAndFlush(studentEntityToAdd);
         return true;
     }
@@ -55,7 +53,7 @@ public class StudentService {
             studentEntity.setRate(updateStudentDto.getRate());
             studentRepository.save(studentEntity);
         }
-        return foundedStudent.map(studentEntity ->  modelMapper.map(studentEntity,StudentDto.class));
+        return foundedStudent.map(studentEntity -> modelMapper.map(studentEntity, StudentDto.class));
     }
 
     public Optional<StudentDto> editStudent(String email, StudentDto updateStudentDto) {
@@ -64,20 +62,21 @@ public class StudentService {
             StudentEntity studentToEdit = foundedStudent.get();
             Optional.ofNullable(updateStudentDto.getEmail()).ifPresent(studentToEdit::setEmail);
             Optional.ofNullable(updateStudentDto.getName()).ifPresent(studentToEdit::setName);
-
-            if(updateStudentDto.getTeacherId() > 0){
-                TeacherEntity teacherToSet = teacherRepository.getById(updateStudentDto.getTeacherId());
-                studentToEdit.setLeadingTeacher(teacherToSet);
-            }
-            if (updateStudentDto.getRate() > 0) {
-                studentToEdit.setRate(updateStudentDto.getRate());
-            }
+            Long teacherId = updateStudentDto.getTeacherId();
+            Optional.of(updateStudentDto.getTeacherId()).ifPresent(id -> studentToEdit.setLeadingTeacher(teacherRepository.getById(teacherId)));
+            Optional.ofNullable(updateStudentDto.getRate()).ifPresent(studentToEdit::setRate);
             studentRepository.save(studentToEdit);
         }
         return foundedStudent.map(studentEntity -> modelMapper.map(studentEntity, StudentDto.class));
     }
 
     public boolean removeStudent(String email) {
-        return studentRepository.deleteByEmail(email);
+        Optional<StudentEntity> foundedStudent = studentRepository.findStudentEntityByEmail(email);
+        if (foundedStudent.isPresent()) {
+            Long studentId = foundedStudent.get().getId();
+            studentRepository.deleteById(studentId);
+            return true;
+        }
+        return false;
     }
 }
